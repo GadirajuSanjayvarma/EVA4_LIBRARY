@@ -25,7 +25,7 @@ def plot_images(img_data, classes, img_name, mean=[0.49139968, 0.48215841, 0.446
       img = denormalize(img_data[index-1]["img"], mean, std)  # unnormalize
       plt.subplot(5, 5, index)
       plt.axis('off')
-      plt.imshow(np.transpose(img.cpu().numpy(), (1, 2, 0)))
+      plt.imshow(((np.transpose(img.cpu().numpy(), (1, 2, 0))*255).astype('uint8')))
       plt.title("Predicted: %s\nActual: %s" % (classes[img_data[index-1]["pred"]], classes[img_data[index-1]["target"]]))
   
   plt.tight_layout()
