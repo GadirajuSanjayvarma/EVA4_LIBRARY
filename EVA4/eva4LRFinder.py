@@ -231,7 +231,7 @@ class LRFinder(object):
             # Forward pass
             outputs = self.model(inputs)
             #loss = self.criterion(outputs, labels)
-            loss=self.nll_loss(outputs,labels)
+            loss=F.nll_loss(outputs,labels)
             # Loss should be averaged in each step
             loss /= accumulation_steps
 
