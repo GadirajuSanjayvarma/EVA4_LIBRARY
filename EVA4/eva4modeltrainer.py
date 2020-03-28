@@ -57,8 +57,8 @@ class Train:
       
       self.stats.add_batch_train_stats(loss.item(), correct, len(data), 0)
       pbar.set_description(self.stats.get_latest_batch_desc())
-      '''if self.scheduler:
-        self.scheduler.step()'''
+      if self.scheduler:
+        self.scheduler.step()
 
 class Test:
   def __init__(self, model, dataloader, stats, scheduler=None):
@@ -88,7 +88,7 @@ class Test:
             self.stats.add_batch_test_stats(self.loss, correct, len(data))
         
         if self.scheduler and isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
-              print("hello yes i am ")
+              #print("hello yes i am ")
               self.scheduler.step(self.loss)
 
 class Misclass:
