@@ -57,8 +57,8 @@ class Train:
       
       self.stats.add_batch_train_stats(loss.item(), correct, len(data), 0)
       pbar.set_description(self.stats.get_latest_batch_desc())
-      if self.scheduler:
-        self.scheduler.step()
+      '''if self.scheduler:
+        self.scheduler.step()'''
 
 class Test:
   def __init__(self, model, dataloader, stats, scheduler=None):
@@ -66,6 +66,7 @@ class Test:
     self.dataloader = dataloader
     self.stats = stats
     self.scheduler = scheduler
+    self.loss=0.0
 
   def run(self):
     self.model.eval()
@@ -73,17 +74,22 @@ class Test:
         for data, target in self.dataloader:
             data, target = data.to(self.model.device), target.to(self.model.device)
             output = self.model(data)
-            loss = F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
+            self.loss = F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
             
             # check for Reduce LR on plateau
             #https://pytorch.org/docs/stable/optim.html#torch.optim.lr_scheduler.ReduceLROnPlateau
-            if self.scheduler and isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
-              self.scheduler.step(loss)
+            '''if self.scheduler and isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+              print("hello yes i am ")
+              self.scheduler.step(loss)'''
 
             pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
             
             correct = pred.eq(target.view_as(pred)).sum().item()
-            self.stats.add_batch_test_stats(loss, correct, len(data))
+            self.stats.add_batch_test_stats(self.loss, correct, len(data))
+        
+        if self.scheduler and isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+              print("hello yes i am ")
+              self.scheduler.step(self.loss)
 
 class Misclass:
   def __init__(self, model, dataloader, stats):
@@ -117,7 +123,7 @@ class ModelTrainer:
     self.optimizer = optimizer
     self.stats = ModelStats(model, statspath)
     self.train = Train(model, train_loader, optimizer, self.stats, self.scheduler if self.batch_scheduler else None, L1lambda)
-    self.test = Test(model, test_loader, self.stats)
+    self.test = Test(model, test_loader, self.stats,self.scheduler)
     self.misclass = Misclass(model, test_loader, self.stats)
 
   def run(self, epochs=10):
