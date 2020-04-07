@@ -67,6 +67,7 @@ class Test:
     self.stats = stats
     self.scheduler = scheduler
     self.loss=0.0
+    self.average_loss=0.0
 
   def run(self):
     self.model.eval()
@@ -75,21 +76,14 @@ class Test:
             data, target = data.to(self.model.device), target.to(self.model.device)
             output = self.model(data)
             self.loss = F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
-            
-            # check for Reduce LR on plateau
-            #https://pytorch.org/docs/stable/optim.html#torch.optim.lr_scheduler.ReduceLROnPlateau
-            '''if self.scheduler and isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
-              print("hello yes i am ")
-              self.scheduler.step(loss)'''
-
+            self.average_loss+=self.loss
             pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
-            
             correct = pred.eq(target.view_as(pred)).sum().item()
             self.stats.add_batch_test_stats(self.loss, correct, len(data))
-        
+        self.average_loss/=len(self.dataloader)
         if self.scheduler and isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
-              #print("hello yes i am ")
-              self.scheduler.step(self.loss)
+              #we are trying to step the scheduler using average loss
+              self.scheduler.step(self.average_loss)
 
 class Misclass:
   def __init__(self, model, dataloader, stats):
