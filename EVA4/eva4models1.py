@@ -27,18 +27,6 @@ class Net(nn.Module):
 
       return nn.Sequential(*l)
 
-
-    def resnetBlock(self,in_channels, out_channels):
-      l=[]
-      l.append(nn.Conv2d(in_channels,out_channels,(3,3),padding=1,bias=False))
-      l.append(nn.BatchNorm2d(out_channels))
-      l.append(nn.ReLU())
-      l.append(nn.Conv2d(in_channels,out_channels,(3,3),padding=1,bias=False))
-      l.append(nn.BatchNorm2d(out_channels))
-      l.append(nn.ReLU())
-      return nn.Sequential(*l)
-
-
     def create_conv2d(self, in_channels, out_channels, kernel_size=(3,3), dilation=1, groups=1, padding=1, bias=False, bn=True, dropout=0, relu=True, padding_mode="zeros",max_pooling=0):
       return self.activate(self.conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, groups=groups, dilation=dilation, padding=padding, bias=bias, padding_mode=padding_mode), out_channels, bn, dropout, relu,max_pooling)
 
@@ -474,7 +462,16 @@ class newResnetS11(Net):
     #ending layer or layer-4
     self.maxpool=nn.MaxPool2d(4,1)
     self.fc_layer=self.create_conv2d(512, 10, kernel_size=(1,1), padding=0, bn=False, relu=False)
-  
+  def resnetBlock(self,in_channels, out_channels):
+      l=[]
+      l.append(nn.Conv2d(in_channels,out_channels,(3,3),padding=1,bias=False))
+      l.append(nn.BatchNorm2d(out_channels))
+      l.append(nn.ReLU())
+      l.append(nn.Conv2d(in_channels,out_channels,(3,3),padding=1,bias=False))
+      l.append(nn.BatchNorm2d(out_channels))
+      l.append(nn.ReLU())
+      return nn.Sequential(*l)
+
   def forward(self,x):
     #prepLayer
     x=self.prepLayer(x)
