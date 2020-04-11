@@ -11,11 +11,11 @@ class lrRangeFinder():
     self.average_accuracy=0.0
   def plot(self,epochs):
     for i in range(epochs):
+        print("starting {} epoch:".format(i+1))
         self.model.train()
         self.average_accuracy=0.0
-        self.optimizer = optim.SGD(model.parameters(), lr=self.learning_rate, momentum=0.9, nesterov=True)
+        self.optimizer = optim.SGD(self.model.parameters(), lr=self.learning_rate, momentum=0.9, nesterov=True)
         pbar = tqdm_notebook(self.dataloader)
-        print("starting {} epoch:".format(i+1))
         for data, target in pbar:
             # get samples
             data, target = data.to(self.model.device), target.to(self.model.device)
