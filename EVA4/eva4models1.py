@@ -442,8 +442,8 @@ class ResNet(nn.Module):
       return self.trainer.stats if self.trainer else None
 
 
-def ResNet18():
-    return ResNet(BasicBlock, [2,2,2,2])
+def ResNet18(num_class=10):
+    return ResNet(BasicBlock, [2,2,2,2],num_classes=num_class)
 
 
 #implementation of the new resnet model
