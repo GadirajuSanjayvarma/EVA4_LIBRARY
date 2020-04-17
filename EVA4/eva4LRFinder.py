@@ -226,8 +226,8 @@ class LRFinder(object):
         self.optimizer.zero_grad()
         for i in range(accumulation_steps):
             inputs, labels = iter_wrapper.get_batch()
-            inputs, labels = self._move_to_device(inputs, labels)
-
+            inputs, labels = inputs[0].to(self.model.device),labels.to(self.model.device)
+            labels=labels.view(-1)
             # Forward pass
             outputs = self.model(inputs)
             #loss = self.criterion(outputs, labels)
