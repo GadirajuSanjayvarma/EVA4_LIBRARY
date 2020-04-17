@@ -18,7 +18,7 @@ class Train:
     pbar = tqdm_notebook(self.dataloader)
     for data, target in pbar:
       # get samples
-      data, target = data.to(self.model.device), target.to(self.model.device)
+      data, target = data[0].to(self.model.device), target.to(self.model.device)
 
       # Init
       self.optimizer.zero_grad()
@@ -27,7 +27,7 @@ class Train:
 
       # Predict
       y_pred = self.model(data)
-
+      target=target.view(-1)
       # Calculate loss
       loss = F.nll_loss(y_pred, target)
 
@@ -73,7 +73,8 @@ class Test:
     self.model.eval()
     with torch.no_grad():
         for data, target in self.dataloader:
-            data, target = data.to(self.model.device), target.to(self.model.device)
+            data, target = data[0].to(self.model.device), target.to(self.model.device)
+            target=target.view(-1)
             output = self.model(data)
             self.loss = F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
             self.average_loss+=self.loss
@@ -97,7 +98,8 @@ class Misclass:
         for data, target in self.dataloader:
           if len(self.stats.misclassified_images) == 25:
             return
-          data, target = data.to(self.model.device), target.to(self.model.device)
+          data, target = data[0].to(self.model.device), target.to(self.model.device)
+          target=target.view(-1)
           output = self.model(data)
           loss = F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
           pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
