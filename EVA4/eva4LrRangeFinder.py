@@ -18,8 +18,8 @@ class lrRangeFinder():
         pbar = tqdm_notebook(self.dataloader)
         for data, target in pbar:
             # get samples
-            data, target = data.to(self.model.device), target.to(self.model.device)
-
+            data, target = data[0].to(self.model.device), target.to(self.model.device)
+            target=target.view(-1)
             # Init
             self.optimizer.zero_grad()
             # In PyTorch, we need to set the gradients to zero before starting to do backpropragation because PyTorch accumulates the gradients on subsequent backward passes. 
